@@ -1,0 +1,74 @@
+--------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\macmia\OneDrive - Dickinson College\Mac-398-Project\Analys
+> is_Data/construction.log
+  log type:  text
+ opened on:   5 May 2024, 16:59:44
+
+. ******************************************************************************
+> **
+. 
+. //Open the base file
+. use "Original_Data\base_file.dta"
+
+. 
+. //Remove variables that do not need
+. 
+. drop agriculture
+
+. drop waste
+
+. drop landuse_forestry
+
+. drop transportation
+
+. drop total_energyuse
+
+. drop certified_operations
+
+. drop crops
+
+. drop pasture_rangeland
+
+. drop _merge
+
+. drop energy
+
+. 
+. //Re-scale the total_organic_arces to total_organic_thousands_of_arces
+. gen total_organic_thousands_of_arces = total_organic_arces / 1000
+
+. 
+. save "Analysis_Data\analysis.dta", replace
+file Analysis_Data\analysis.dta saved
+
+. 
+. describe
+
+Contains data from Analysis_Data\analysis.dta
+ Observations:           450                  
+    Variables:             7                  5 May 2024 16:59
+--------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+--------------------------------------------------------------------------------
+state           str20   %20s                  State
+year            float   %10.0g                Year
+totalCO2        double  %10.0g                Total CO2 (excluding LUCF)
+                                                (MtCO2e)
+state_gdp       double  %10.0g                State GDP (Million US$ (chained
+                                                1997/2005))
+population      long    %10.0g                Population (People)
+total_o~c_arces double  %10.0g                total_organic_arces
+total_o~f_arces float   %9.0g                 
+--------------------------------------------------------------------------------
+Sorted by: 
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\macmia\OneDrive - Dickinson College\Mac-398-Project\Analys
+> is_Data/construction.log
+  log type:  text
+ closed on:   5 May 2024, 16:59:45
+--------------------------------------------------------------------------------

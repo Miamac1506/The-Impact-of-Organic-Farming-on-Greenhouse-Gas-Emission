@@ -1,0 +1,150 @@
+----------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\macmia\OneDrive - Dickinson College\Mac-398-Project\Analysis_Data/analys
+> is.log
+  log type:  text
+ opened on:   3 May 2024, 14:23:57
+
+. ********************************************************************************
+. 
+. //Open the analysis file
+. use "Analysis_Data\analysis.dta"
+
+. 
+. //Re-scale the total_organic_arces to total_organic_thousands_of_arces
+. 
+. // Estimate the relationship of organic_farming and greenhouse gas emission
+. 
+. // One way fixed effects control only for GDP and population
+. ssc install outreg2
+checking outreg2 consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. reg totalCO2 total_organic_thousands_of_arces state_gdp population, robust
+
+Linear regression                               Number of obs     =        450
+                                                F(3, 446)         =      74.72
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.7345
+                                                Root MSE          =     61.374
+
+---------------------------------------------------------------------------------------------
+                            |               Robust
+                   totalCO2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------------------+----------------------------------------------------------------
+total_organic_thousands_o~s |    .088216   .0401465     2.20   0.029     .0093162    .1671157
+                  state_gdp |  -.0007457   .0001032    -7.23   0.000    -.0009486   -.0005429
+                 population |    .000048   5.08e-06     9.46   0.000      .000038     .000058
+                      _cons |   15.52178   6.107962     2.54   0.011     3.517814    27.52574
+---------------------------------------------------------------------------------------------
+
+. outreg2 using Analysis_Data/analysisregs.xls,  ctitle(OLS) replace
+Analysis_Data/analysisregs.xls
+dir : seeout
+
+. 
+. // Add in year fixed effects
+. egen stateID = group(state)
+
+. 
+. xtset stateID year
+
+Panel variable: stateID (strongly balanced)
+ Time variable: year, 2000 to 2008
+         Delta: 1 unit
+
+. 
+. xtreg totalCO2 total_organic_thousands_of_arces state_gdp population, fe vce(cluster state)
+
+Fixed-effects (within) regression               Number of obs     =        450
+Group variable: stateID                         Number of groups  =         50
+
+R-squared:                                      Obs per group:
+     Within  = 0.0214                                         min =          9
+     Between = 0.7182                                         avg =        9.0
+     Overall = 0.7150                                         max =          9
+
+                                                F(3, 49)          =       0.31
+corr(u_i, Xb) = -0.8787                         Prob > F          =     0.8181
+
+                                                (Std. err. adjusted for 50 clusters in state)
+---------------------------------------------------------------------------------------------
+                            |               Robust
+                   totalCO2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------------------+----------------------------------------------------------------
+total_organic_thousands_o~s |   .0005872   .0033114     0.18   0.860    -.0060672    .0072416
+                  state_gdp |   .0000555   .0000717     0.77   0.443    -.0000886    .0001997
+                 population |  -4.94e-06   9.54e-06    -0.52   0.607    -.0000241    .0000142
+                      _cons |   136.4634   41.70849     3.27   0.002     52.64707    220.2798
+----------------------------+----------------------------------------------------------------
+                    sigma_u |  133.56955
+                    sigma_e |  5.1825415
+                        rho |   .9984968   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------------
+
+. outreg2 using Analysis_Data/analysisregs.xls, ctitle (FE-1) append
+Analysis_Data/analysisregs.xls
+dir : seeout
+
+. // Add in both year fixed effect and state fixed effect 
+. 
+. xtset stateID year
+
+Panel variable: stateID (strongly balanced)
+ Time variable: year, 2000 to 2008
+         Delta: 1 unit
+
+. 
+. xtreg totalCO2 total_organic_thousands_of_arces state_gdp population i.year, fe vce(cluster 
+> state)
+
+Fixed-effects (within) regression               Number of obs     =        450
+Group variable: stateID                         Number of groups  =         50
+
+R-squared:                                      Obs per group:
+     Within  = 0.1318                                         min =          9
+     Between = 0.6974                                         avg =        9.0
+     Overall = 0.6883                                         max =          9
+
+                                                F(11, 49)         =       7.33
+corr(u_i, Xb) = -0.8729                         Prob > F          =     0.0000
+
+                                                (Std. err. adjusted for 50 clusters in state)
+---------------------------------------------------------------------------------------------
+                            |               Robust
+                   totalCO2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------------------+----------------------------------------------------------------
+total_organic_thousands_o~s |  -.0000151   .0027353    -0.01   0.996    -.0055119    .0054816
+                  state_gdp |   .0000267   .0000739     0.36   0.719    -.0001219    .0001753
+                 population |  -4.26e-06   9.94e-06    -0.43   0.671    -.0000242    .0000157
+                            |
+                       year |
+                      2001  |  -2.269134   .8716421    -2.60   0.012    -4.020764   -.5175033
+                      2002  |  -1.247699   1.118239    -1.12   0.270    -3.494885    .9994865
+                      2003  |  -.1735782    1.25639    -0.14   0.891    -2.698388    2.351232
+                      2004  |    2.27506   1.435019     1.59   0.119    -.6087191     5.15884
+                      2005  |   2.610861   1.323341     1.97   0.054    -.0484923    5.270215
+                      2006  |   1.098407   1.649395     0.67   0.509    -2.216176    4.412989
+                      2007  |   2.946691   1.927812     1.53   0.133    -.9273916    6.820774
+                      2008  |  -.8269893   2.211162    -0.37   0.710    -5.270486    3.616508
+                            |
+                      _cons |   138.9946   44.19411     3.15   0.003     50.18324     227.806
+----------------------------+----------------------------------------------------------------
+                    sigma_u |  136.70764
+                    sigma_e |   4.931222
+                        rho |  .99870055   (fraction of variance due to u_i)
+---------------------------------------------------------------------------------------------
+
+. outreg2 using Analysis_Data/analysisregs.xls, ctitle (FE-2) append
+Analysis_Data/analysisregs.xls
+dir : seeout
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\macmia\OneDrive - Dickinson College\Mac-398-Project\Analysis_Data/analys
+> is.log
+  log type:  text
+ closed on:   3 May 2024, 14:23:58
+----------------------------------------------------------------------------------------------

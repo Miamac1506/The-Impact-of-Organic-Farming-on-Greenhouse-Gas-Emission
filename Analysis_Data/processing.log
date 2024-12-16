@@ -1,0 +1,306 @@
+-----------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\macmia\OneDrive - Dickinson College\Mac-398-Project\Analysis_
+> Data/processing.log
+  log type:  text
+ opened on:   9 Apr 2024, 14:39:36
+
+. ********************************************************************************
+. //IMPORT AND CLEAN EMISSIONS DATA
+. 
+. //Import the original data from climatewatch-usemissions_importable.xlsx and reta
+> in only the variables relevant for the research
+. import excel "Original_Data\climatewatch-usemissions_importable.xlsx", firstrow 
+(23 vars, 1,508 obs)
+
+. keep State Year TotalCO2excludingLUCFMtCO EnergyMtCO2e AgricultureMtCO2e WasteMtC
+> O2e LandUseandForestryMtCO2e TransportationMtCO2e StateGDPMillionUSchained Popula
+> tionPeople TotalEnergyUseThoustonnes
+
+. 
+. //Rename teh variabls to make it more managable
+. rename State state
+
+. rename Year year
+
+. rename TotalCO2excludingLUCFMtCO totalCO2
+
+. rename EnergyMtCO2e energy
+
+. rename AgricultureMtCO2e agriculture
+
+. rename WasteMtCO2e waste
+
+. rename LandUseandForestryMtCO2e landuse_forestry
+
+. rename TransportationMtCO2e transportation
+
+. rename StateGDPMillionUSchained state_gdp
+
+. rename PopulationPeople population
+
+. rename TotalEnergyUseThoustonnes total_energyuse
+
+. 
+. //Since we are only examining organic agriculture and emission across the 50 stat
+> es of the United States from 2000 to 2008, exclude entries for the "United States
+> " and the "District of Columbia," as they are not among the 50 states, and remove
+>  data for non-relevant years
+. drop if state == "United States"
+(29 observations deleted)
+
+. drop if state == "District Of Columbia"
+(29 observations deleted)
+
+. drop if year == 1990
+(50 observations deleted)
+
+. drop if year == 1991
+(50 observations deleted)
+
+. drop if year == 1992
+(50 observations deleted)
+
+. drop if year == 1993
+(50 observations deleted)
+
+. drop if year == 1994
+(50 observations deleted)
+
+. drop if year == 1995
+(50 observations deleted)
+
+. drop if year == 1996
+(50 observations deleted)
+
+. drop if year == 1997
+(50 observations deleted)
+
+. drop if year == 1998
+(50 observations deleted)
+
+. drop if year == 1999
+(50 observations deleted)
+
+. drop if year == 2009
+(50 observations deleted)
+
+. drop if year == 2010
+(50 observations deleted)
+
+. drop if year == 2011
+(50 observations deleted)
+
+. drop if year == 2012
+(50 observations deleted)
+
+. drop if year == 2013
+(50 observations deleted)
+
+. drop if year == 2014
+(50 observations deleted)
+
+. drop if year == 2015
+(50 observations deleted)
+
+. drop if year == 2016
+(50 observations deleted)
+
+. drop if year == 2017
+(50 observations deleted)
+
+. drop if year == 2018
+(50 observations deleted)
+
+. 
+. // Save the original data as emission.dta in the Original_Data folder
+. save "Original_Data\emission.dta", replace
+file Original_Data\emission.dta saved
+
+. 
+. ********************************************************************************
+. // IMPORT AND CLEAN THE ORGANIC AGRICULTURE DATA
+. 
+. //Import PastrCropbyState_importable.xlsx
+. clear
+
+. local excel_file "Original_Data\PastrCropbyState_importable.xlsx"
+
+. 
+. //Since this dataset has multiple sheets for different years, to import them into
+>  Stata, creating a variable indicating the year and then save each dataset sepera
+> tely. 
+. // List of years
+. local years "08 07 06 05 04 03 02 01 00" 
+
+. 
+. // Loop over each year
+. foreach year in `years' {
+  2.     // Import data from Excel sheet
+.     import excel "`excel_file'", sheet("pastcrop`year'") firstrow
+  3. 
+.     // Create a variable for the year
+.     gen year = 20`year'
+  4. 
+.     // Save the dataset as a Stata file
+.     save "Original_Data\pastcrop`year'.dta", replace
+  5.         clear
+  6. }
+(5 vars, 50 obs)
+file Original_Data\pastcrop08.dta saved
+(10 vars, 50 obs)
+file Original_Data\pastcrop07.dta saved
+(9 vars, 50 obs)
+file Original_Data\pastcrop06.dta saved
+(5 vars, 50 obs)
+file Original_Data\pastcrop05.dta saved
+(5 vars, 50 obs)
+file Original_Data\pastcrop04.dta saved
+(5 vars, 50 obs)
+file Original_Data\pastcrop03.dta saved
+(5 vars, 50 obs)
+file Original_Data\pastcrop02.dta saved
+(5 vars, 50 obs)
+file Original_Data\pastcrop01.dta saved
+(13 vars, 51 obs)
+file Original_Data\pastcrop00.dta saved
+
+. 
+. clear
+
+. //Cleaning specific years manually
+. //In the variable "crops", replacing '--' with '0' indicating missing or unspecif
+> ic data to make it consistent with the rest of the dataset.
+. use "Original_Data\pastcrop01.dta"
+
+. replace crops = "0" if crops == "--"
+(1 real change made)
+
+. replace pasture_rangeland = "0" if pasture_rangeland == "--"
+(1 real change made)
+
+. replace total_organic_arces = "0" if total_organic_arces == "--"
+(1 real change made)
+
+. replace state = "Colorado" if state == "Colorado 1/"
+(1 real change made)
+
+. replace state = "Louisiana" if state == "Louisana"
+(1 real change made)
+
+. replace state = "Mississippi" if state == "Mississippi "
+(1 real change made)
+
+. 
+. destring crops, replace
+crops: all characters numeric; replaced as double
+
+. destring pasture_rangeland, replace
+pasture_rangeland: all characters numeric; replaced as double
+
+. destring total_organic_arces, replace
+total_organic_arces: all characters numeric; replaced as double
+
+. 
+. save "Original_Data\pastcrop01.dta", replace
+file Original_Data\pastcrop01.dta saved
+
+. 
+. clear
+
+. use "Original_Data\pastcrop00.dta"
+
+. replace crops = "0" if crops == "--"
+(1 real change made)
+
+. replace pasture_rangeland = "0" if pasture_rangeland == "--"
+(1 real change made)
+
+. replace total_organic_arces = "0" if total_organic_arces == "--"
+(1 real change made)
+
+. replace state = "Colorado" if state == "Colorado 1/"
+(1 real change made)
+
+. replace state = "Louisiana" if state == "Louisana"
+(1 real change made)
+
+. replace state = "Mississippi" if state == "Mississippi "
+(1 real change made)
+
+. 
+. destring crops, replace
+crops: all characters numeric; replaced as double
+(1 missing value generated)
+
+. destring pasture_rangeland, replace
+pasture_rangeland: all characters numeric; replaced as double
+(1 missing value generated)
+
+. destring total_organic_arces, replace
+total_organic_arces: all characters numeric; replaced as double
+(1 missing value generated)
+
+. 
+. save "Original_Data\pastcrop00.dta", replace
+file Original_Data\pastcrop00.dta saved
+
+. 
+. clear
+
+. 
+. //Appending data for years 2000 to 2007 to pastcrop08.dta
+. use "Original_Data\pastcrop08.dta"
+
+. //List of years
+. local years "07 06 05 04 03 02 01 00" 
+
+. 
+. // Loop over each year
+. foreach year in `years' {
+  2.         append using "Original_Data\pastcrop`year'.dta", force
+  3. }
+
+. 
+. //Drop the irrelevant variables of the research
+. drop F-M
+
+. 
+. save "Original_Data\pastcrop.dta", replace
+file Original_Data\pastcrop.dta saved
+
+. ********************************************************************************
+. //COMBINING THE TWO DATASETS
+. 
+. clear
+
+. 
+. use "Original_Data\emission.dta"
+
+. 
+. merge 1:m state year using "Original_Data\pastcrop.dta"
+(variable year was int, now float to accommodate using data's values)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             1
+        from master                         0  (_merge==1)
+        from using                          1  (_merge==2)
+
+    Matched                               450  (_merge==3)
+    -----------------------------------------
+
+. 
+. save "Original_Data\base_file.dta", replace
+file Original_Data\base_file.dta saved
+
+. use "Original_Data\base_file.dta"
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\macmia\OneDrive - Dickinson College\Mac-398-Project\Analysis_
+> Data/processing.log
+  log type:  text
+ closed on:   9 Apr 2024, 14:39:37
+-----------------------------------------------------------------------------------

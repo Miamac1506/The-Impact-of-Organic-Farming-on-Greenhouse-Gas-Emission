@@ -1,4 +1,4 @@
-### About
+## The Impact of Organic Farming on Greenhouse Gas Emission
 
 ### Introduction
 This research investigates the relationship between organic farming and greenhouse gas (GHG) emissions in the United States. While organic farming is celebrated for its environmental benefits, including soil carbon sequestration and reduced chemical use, its effect on GHG emissions remains contentious. Using state-level data from 2000 to 2008, this study explores whether expanding certified organic acreage contributes to lowering total GHG emissions.
